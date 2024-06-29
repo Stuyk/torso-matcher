@@ -16,5 +16,8 @@
     "mongodb": "^6.8.0",
     "nuxt": "^3.12.2",
     "vue": "latest"
+  },
+  "engines": {
+    "node": ">=20.12.2"
   }
 }

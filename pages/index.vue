@@ -95,9 +95,7 @@
 </template>
 
 <script lang="ts" setup>
-import { callWithNuxt } from "#app";
-
-const isMale = ref(false);
+const isMale = ref(Math.floor(Math.random() * 2) ? true : false);
 const isSubmitted = ref(false);
 const selectedTorsos = ref<string[]>([]);
 
@@ -116,35 +114,19 @@ const femaleTorsos = await useFetch<string[]>("/api/getFemaleTorsos", {
 const torsoIndex = ref(0);
 const topIndex = ref(0);
 
+function getRandom() {
+  if (isMale && maleTops.data.value) {
+    topIndex.value = Math.floor(Math.random() * maleTops.data.value.length);
+    return;
+  }
+
+  if (!isMale && femaleTops.data.value) {
+    topIndex.value = Math.floor(Math.random() * femaleTops.data.value.length);
+  }
+}
+
 async function skip() {
-  const nuxtApp = useNuxtApp();
-  const newMaleTops = await callWithNuxt(nuxtApp, useFetch, [
-    `/api/getMaleTops`,
-  ]);
-  const newFemaleTops = await callWithNuxt(nuxtApp, useFetch, [
-    `/api/getFemaleTops`,
-  ]);
-
-  if (newMaleTops) {
-    maleTops.data = newMaleTops.data as Ref<string[]>;
-  }
-
-  if (newFemaleTops) {
-    femaleTops.data = newFemaleTops.data as Ref<string[]>;
-  }
-
-  selectedTorsos.value = [];
-
-  isMale.value = !isMale.value;
-  let topsLength = isMale
-    ? maleTops.data.value?.length
-    : femaleTops.data.value?.length;
-
-  if (!topsLength) {
-    topsLength = 0;
-  }
-
-  topIndex.value = Math.floor(Math.random() * topsLength);
+  window.location.reload();
 }
 
 function toggleTorso(torso: string) {
@@ -200,5 +182,5 @@ const getMaleTops = computed(() => {
   return maleTops.data.value;
 });
 
-skip();
+getRandom();
 </script>
