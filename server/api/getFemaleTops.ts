@@ -6,6 +6,7 @@ export default defineEventHandler(async (event) => {
     .sync("public/female-tops/**/*.png")
     .map((x) => x.replace("public/", ""));
 
+  const copyOfImages = [...images];
   const votedImages = await getVotedImages();
 
   for (let i = images.length - 1; i >= 0; i--) {
@@ -14,9 +15,12 @@ export default defineEventHandler(async (event) => {
         continue;
       }
 
-      console.log(`Removed: ${images[i]}`);
       images.splice(i, 1);
     }
+  }
+
+  if (images.length <= 0) {
+    return copyOfImages;
   }
 
   return images;

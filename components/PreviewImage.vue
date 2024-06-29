@@ -6,11 +6,10 @@
     <img
       :src="props?.torso"
       class="col-start-1 row-start-1 object-contain opacity-70"
-      :class="props?.male ? [''] : []"
     />
   </div>
 </template>
 
 <script lang="ts" setup>
-const props = defineProps<{ top: string; torso: string; male: boolean }>();
+const props = defineProps<{ top: string; torso: string }>();
 </script>

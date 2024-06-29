@@ -5,6 +5,13 @@
   >
     <span class="text-4xl text-white">Submitting...</span>
   </div>
+  <div
+    class="w-screen h-screen fixed top-0 left-0 bg-black opacity-90 z-10 items-center justify-center flex flex-col gap-6"
+    v-if="isLoading"
+  >
+    <IconsProgressIcon class="animate-spin text-white text-6xl" />
+    <span class="text-4xl text-white">Loading</span>
+  </div>
   <div class="flex flex-col">
     <span class="text-3xl px-8 pt-5 font-bold text-stone-800 select-none"
       >Stuyk's Torso Matcher</span
@@ -18,22 +25,12 @@
     <div
       class="flex flex-col items-center justify-center text-white gap-5 w-full p-8 md:flex-row"
     >
-      <template
-        v-if="getFemaleTops && getFemaleTorsos && getMaleTops && getMaleTorsos"
-      >
-        <PreviewImage
-          :male="isMale"
-          :top="isMale ? getMaleTops[topIndex] : getFemaleTops[topIndex]"
-          :torso="
-            isMale ? getMaleTorsos[torsoIndex] : getFemaleTorsos[torsoIndex]
-          "
-        />
-      </template>
+      <PreviewImage :top="getTops[topIndex]" :torso="getTorsos[torsoIndex]" />
 
       <div class="flex flex-col h-full gap-5">
         <div class="grid grid-cols-4 gap-5 flex-grow">
           <div
-            v-for="(img, index) in isMale ? getMaleTorsos : getFemaleTorsos"
+            v-for="(img, index) in getTorsos"
             class="bg-stone-800 rounded-lg p-3 border-2 border-stone-700 hover:border-stone-400 cursor-pointer shadow-xl active:scale-95 relative"
             :class="
               isSelected(img)
@@ -95,9 +92,10 @@
 </template>
 
 <script lang="ts" setup>
-const isMale = ref(Math.floor(Math.random() * 2) ? true : false);
+const isMale = ref(false);
 const isSubmitted = ref(false);
 const selectedTorsos = ref<string[]>([]);
+const isLoading = ref(true);
 
 let maleTops = await useFetch<string[]>("/api/getMaleTops", { server: true });
 let femaleTops = await useFetch<string[]>("/api/getFemaleTops", {
@@ -107,23 +105,13 @@ let femaleTops = await useFetch<string[]>("/api/getFemaleTops", {
 const maleTorsos = await useFetch<string[]>("/api/getMaleTorsos", {
   server: true,
 });
+
 const femaleTorsos = await useFetch<string[]>("/api/getFemaleTorsos", {
   server: true,
 });
 
 const torsoIndex = ref(0);
 const topIndex = ref(0);
-
-function getRandom() {
-  if (isMale && maleTops.data.value) {
-    topIndex.value = Math.floor(Math.random() * maleTops.data.value.length);
-    return;
-  }
-
-  if (!isMale && femaleTops.data.value) {
-    topIndex.value = Math.floor(Math.random() * femaleTops.data.value.length);
-  }
-}
 
 async function skip() {
   window.location.reload();
@@ -166,21 +154,74 @@ async function submit() {
   skip();
 }
 
-const getMaleTorsos = computed(() => {
-  return maleTorsos.data.value;
-});
+const getTorsos = computed(() => {
+  if (isMale.value) {
+    if (!maleTorsos.data.value) {
+      return [];
+    }
 
-const getFemaleTorsos = computed(() => {
+    return maleTorsos.data.value;
+  }
+
+  if (!femaleTorsos.data.value) {
+    return [];
+  }
+
   return femaleTorsos.data.value;
 });
 
-const getFemaleTops = computed(() => {
+const getTops = computed(() => {
+  if (isMale.value) {
+    if (!maleTops.data.value) {
+      return [];
+    }
+
+    return maleTops.data.value;
+  }
+
+  if (!femaleTops.data.value) {
+    return [];
+  }
+
   return femaleTops.data.value;
 });
 
-const getMaleTops = computed(() => {
-  return maleTops.data.value;
-});
+onMounted(async () => {
+  isMale.value = Math.floor(Math.random() * 2) ? true : false;
 
-getRandom();
+  await new Promise((resolve: Function) => {
+    const interval = setInterval(() => {
+      if (!maleTops.data.value || maleTops.data.value.length <= 0) {
+        return;
+      }
+
+      if (!femaleTops.data.value || femaleTops.data.value.length <= 0) {
+        return;
+      }
+
+      if (!maleTorsos.data.value || maleTorsos.data.value.length <= 0) {
+        return;
+      }
+
+      if (!femaleTorsos.data.value || femaleTorsos.data.value.length <= 0) {
+        return;
+      }
+
+      clearInterval(interval);
+      resolve();
+    }, 500);
+  });
+
+  if (!maleTops.data.value || !femaleTops.data.value) {
+    return;
+  }
+
+  if (isMale.value) {
+    topIndex.value = Math.floor(Math.random() * maleTops.data.value.length);
+  } else {
+    topIndex.value = Math.floor(Math.random() * femaleTops.data.value.length);
+  }
+
+  isLoading.value = false;
+});
 </script>
