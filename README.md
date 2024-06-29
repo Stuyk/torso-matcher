@@ -10,6 +10,10 @@ Special thanks to the [alt:V Community](https://altv.mp) for helping build this 
 
 Check out [https://rebarv.com](https://rebarv.com) for a really easy TypeScript framework for GTA:V.
 
+## Screenshot
+
+![brave_yEpInwoWTr](https://github.com/Stuyk/torso-matcher/assets/21284100/e1b64701-6c1b-4839-a9e0-9007cac03638)
+
 ## Setup
 
 ```bash
