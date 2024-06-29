@@ -2,4 +2,7 @@
 export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ["@nuxtjs/tailwindcss"],
+  runtimeConfig: {
+    mongodb: "mongodb://localhost:27017",
+  },
 });

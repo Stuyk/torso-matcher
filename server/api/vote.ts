@@ -2,7 +2,7 @@ import { BSON, MongoClient } from "mongodb";
 
 const runtimeConfig = useRuntimeConfig();
 
-const uri = runtimeConfig.MONGODB || "mongodb://localhost:27017";
+const uri = runtimeConfig.mongodb;
 const dbName = runtimeConfig.Database || "TorsoMatchVotes";
 const collectionName = "Votes";
 
